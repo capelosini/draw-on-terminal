@@ -2,6 +2,21 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+#include <math.h>
+
+int nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
+
+struct Draw;
+typedef struct Draw Draw;
+Draw* drawInit();
+void drawDestroy(Draw* draw);
+void setPixel(Draw* draw, int x, int y);
+void clearCanva(Draw* draw);
+long calculateFPS(Draw* draw);
+void render(Draw* draw);
+void square(Draw* draw, int x, int y, int size);
+void circle(Draw* draw, int x, int y, int r);
 
 struct Draw{
     int width;
@@ -10,9 +25,9 @@ struct Draw{
     char backgroundChar;
     char animation;
     char *canva;
+    float xScale; // This's a number to make the size of drawn object almost the same in coords x and y, because letters has a larger y than x
+    unsigned char fps;
 };
-
-typedef struct Draw Draw;
 
 Draw* drawInit(){
     Draw* draw = malloc(sizeof(Draw));
@@ -24,7 +39,14 @@ Draw* drawInit(){
     draw->pixelChar = '#';
     draw->backgroundChar = ' ';
     draw->animation = 0;
+    draw->xScale = 1.5;
+    draw->fps = 24;
     return draw;
+}
+
+void drawDestroy(Draw* draw){
+    free(draw->canva);
+    free(draw);
 }
 
 void setPixel(Draw* draw, int x, int y){
@@ -39,9 +61,12 @@ void clearCanva(Draw* draw){
     //draw->canva = malloc(sizeof(char)*draw->width*draw->height);
 }
 
+long calculateFPS(Draw* draw){
+    // Calculate the sleep value in nanoseconds based in the fps value
+    return 1000000000/draw->fps;
+}
+
 void render(Draw* draw){
-    if (draw->animation == 1)
-        clearCanva(draw);
     for(int y = 0; y < draw->height; y++){
         for(int x = 0; x < draw->width; x++){
             if(draw->canva[x + y*draw->width] == 1)
@@ -52,21 +77,37 @@ void render(Draw* draw){
         if (y != draw->height-1)
             printf("\n");
     }
+    if (draw->animation)
+        clearCanva(draw);
+        long s = calculateFPS(draw);
+        struct timespec* value;
+        if (s > 999999999){
+            value = &(struct timespec){1,0};
+        } else{
+            value = &(struct timespec){0,s};
+        }
+        nanosleep(value, NULL);
 }
 
 void square(Draw* draw, int x, int y, int size){
     for(int i = 0; i < size; i++){
         setPixel(draw, x, y+i);
     }
-    for(int i = 0; i < size*1.5; i++){
+    for(int i = 0; i < size*draw->xScale; i++){
         setPixel(draw, x+i, y);
     }
-    x=x+(size*1.5);
+    x=x+(size*draw->xScale);
     y=y+(size-1);
     for(int i = 0; i < size; i++){
         setPixel(draw, x, y-i);
     }
-    for(int i = 0; i < size*1.5; i++){
+    for(int i = 0; i < size*draw->xScale; i++){
         setPixel(draw, x-i, y);
+    }
+}
+
+void circle(Draw* draw, int x, int y, int r){
+    for(int ang=0; ang<45; ang++){
+        setPixel(draw, x+(r*draw->xScale)*cos(ang), y+r*sin(ang));
     }
 }

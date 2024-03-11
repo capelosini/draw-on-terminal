@@ -7,12 +7,15 @@
 int main(){
 
     Draw* d = drawInit();
+    d->animation = 1;
+    d->fps = 45;
 
-    square(d, 3, 3, 3);
+    for (int i=0; i<=d->height; i++){
+        circle(d, d->width/2+i, 3+i, 3);
+        render(d);
+    }
 
-    render(d);
-
-    scanf("%d");
+    drawDestroy(d);
 
     return 0;
 }
