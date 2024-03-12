@@ -7,13 +7,12 @@
 int main(){
 
     Draw* d = drawInit();
-    d->animation = 1;
-    d->fps = 45;
+    d->animation = 0;
+    //d->fps = 45;
 
-    for (int i=0; i<=d->height; i++){
-        circle(d, d->width/2+i, 3+i, 3);
-        render(d);
-    }
+    line(d, d->width/2, d->height/2, 0, 0);
+    line(d, d->width/2, d->height/2, d->width, 0);
+    render(d);
 
     drawDestroy(d);
 
