@@ -12,17 +12,20 @@ typedef struct Draw Draw;
 Draw* drawInit();
 void drawDestroy(Draw* draw);
 void setPixel(Draw* draw, int x, int y);
+char getPixel(Draw* draw, int x, int y);
+void clearPixel(Draw* draw, int x, int y);
 void clearCanva(Draw* draw);
 long calculateFPS(Draw* draw);
 void render(Draw* draw);
 void square(Draw* draw, int x, int y, int size);
 void circle(Draw* draw, int x, int y, int r);
 void line(Draw* draw, int x1, int y1, int x2, int y2);
+void point(Draw* draw, int x, int y);
 
 struct Draw{
     int width;
     int height;
-    char pixelChar;
+    char strokeChar;
     char backgroundChar;
     char animation;
     char *canva;
@@ -37,7 +40,7 @@ Draw* drawInit(){
     draw->width = size.ws_col;
     draw->height = size.ws_row;
     draw->canva = malloc(sizeof(char)*draw->width*draw->height);
-    draw->pixelChar = '#';
+    draw->strokeChar = '#';
     draw->backgroundChar = ' ';
     draw->animation = 0;
     draw->xScale = 1.5;
@@ -53,6 +56,19 @@ void drawDestroy(Draw* draw){
 void setPixel(Draw* draw, int x, int y){
     if( (x < draw->width && x >= 0) || (y < draw->height && y >= 0) )
         draw->canva[x + y*draw->width] = 1;
+}
+
+char getPixel(Draw* draw, int x, int y){
+    if( (x < draw->width && x >= 0) || (y < draw->height && y >= 0) )
+        return draw->canva[x + y*draw->width];
+    else{
+        return 0;
+    }
+}
+
+void clearPixel(Draw* draw, int x, int y){
+    if( (x < draw->width && x >= 0) || (y < draw->height && y >= 0) )
+        draw->canva[x + y*draw->width] = 0;
 }
 
 void clearCanva(Draw* draw){
@@ -71,7 +87,7 @@ void render(Draw* draw){
     for(int y = 0; y < draw->height; y++){
         for(int x = 0; x < draw->width; x++){
             if(draw->canva[x + y*draw->width] == 1)
-                printf("%c", draw->pixelChar);
+                printf("%c", draw->strokeChar);
             else
                 printf("%c", draw->backgroundChar);
         }
@@ -126,4 +142,8 @@ void line(Draw* draw, int x1, int y1, int x2, int y2){
         if (e2 > -dy){ err -= dy; x1 += sx; }
         if (e2 < dx){ err += dx; y1 += sy; }
     }
+}
+
+void point(Draw* draw, int x, int y){
+    setPixel(draw, x, y);
 }

@@ -1,5 +1,6 @@
 # Binary
 main
+gameoflife
 
 # Prerequisites
 *.d
