@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 #include "drawing.h"
 
 
 int main(int argc, char* argv[]){
     Draw* d = drawInit();
+    d->fps=15;
     srand(time(NULL));
 
     if (argc != 2){
